@@ -1,6 +1,6 @@
 # bin2cpp
 
-`bin2cpp` is a small C++ utility designed to work with binary data and convert it into C++ source code.
+`bin2cpp` is a small C++ utility designed to work with binary data and convert it into С/C++ source code.
 
 ## Requirements
 
@@ -51,6 +51,32 @@ The executable is installed into the standard binary directory as determined by 
 
 The main executable is built from `bin2cpp.cpp`.
 
+
+## Usage:
+```shell
+program [options]
+```
+
+Options:
+* `-help` - Show this help.
+* `-fo <file>` - Specify the output file.
+* `-fi <path> <name>` - Add an input file.
+* `-std <standard>` - Specify the language standard.
+* `-s` - Include size information.
+* `-s_0` - Include size information (0).
+* `-w <number>` - Set the width.
+* `-po` - Add #pragma once.
+* `-cpp_ns <name>` - Set the C++ namespace.
+
+Standards:
+* **ANSI C:** C99, C11, C17, C23
+* **C++:** C++98, C++03, C++11, C++14, C++17, C++20, C++23
+
+Example:
+```shell
+program -fi input.bin data -fo output.hpp -std C++20 -w 16 -po
+```
+  
 ## License Compliance
 
 This project is licensed under the [MITOrundite 1.0 License](LICENSE). 
