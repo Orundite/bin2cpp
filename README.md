@@ -69,7 +69,7 @@ Options:
 * `-cpp_ns <name>` - Set the C++ namespace.
 
 Standards:
-* **ANSI C:** C99, C11, C17, C23
+* **C:** ANSI, C99, C11, C17, C23
 * **C++:** C++98, C++03, C++11, C++14, C++17, C++20, C++23
 
 Example:
