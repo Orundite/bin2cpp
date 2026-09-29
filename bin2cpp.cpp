@@ -492,7 +492,7 @@ bool data(std::ofstream& stream, std::span<const file_input> data)
         if (parametrs::width > 0)
         {
             size_t remainder=size_file%parametrs::width;
-            (remainder==0)?0:(parametrs::width - remainder);
+            bytes_width=(remainder==0)?0:(parametrs::width - remainder);
         }
         if(parametrs::standard==standard_language::ansi)
             stream<<"static const unsigned char ";
