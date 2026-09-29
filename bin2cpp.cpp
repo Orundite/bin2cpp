@@ -437,20 +437,24 @@ void includes(std::ofstream& stream)
 {
     if(detail::is_std_c(parametrs::standard))
     {
-        if(parametrs::standard>=standard_language::c99 ||
-            (parametrs::enable_size||parametrs::enable_size_0)
-            )
+        if(parametrs::enable_size||parametrs::enable_size_0)
         {
             stream<<"\n#include <stddef.h>\n\n";
+        }
+        if(parametrs::standard>=standard_language::c99)
+        {
+            stream<<"\n#include <stdint.h>\n\n";
         }
     }
     else if(detail::is_std_cpp(parametrs::standard))
     {
-        if(parametrs::standard>=standard_language::cpp11 ||
-            (parametrs::enable_size||parametrs::enable_size_0)
-            )
+        if(parametrs::enable_size||parametrs::enable_size_0)
         {
-            stream<<"\n#include <stddef>\n";
+            stream<<"\n#include <cstddef>\n\n";
+        }
+        if(parametrs::standard>=standard_language::cpp11)
+        {
+            stream<<"\n#include <cstdint>\n";
         }
         if(parametrs::standard>=standard_language::cpp17)
             stream<<"#include <array>\n";
