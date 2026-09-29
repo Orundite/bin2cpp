@@ -87,7 +87,7 @@ std::vector<file_input> files;
 standard_language standard = standard_language::c99;
 bool enable_size = false;
 bool enable_size_0 = false;
-std::int64_t width = -1;
+ptrdiff_t width = -1;
 bool enable_pragma_once = false;
 //Unix - указатель на аргумент
 //Win - выделенная память
@@ -358,13 +358,15 @@ bool setting_parametrs(int arg_count,char_c* agrs[])
             ++i;
             char_c* end = nullptr;
             errno = 0;
-            std::int64_t value = cstrtoll(agrs[i], &end, 10);
+            ptrdiff_t value = cstrtoll(agrs[i], &end, 10);
             if (end == agrs[i] || *end != cc('\0') || errno == ERANGE || value <= 0)
             {
-                ccerr << cc("Error: -w requires a positive integer, got \"") << agrs[i] << cc("\"\n");
+                ccerr << cc("Error: -w requires a positive integer (1 to ")
+                      << PTRDIFF_MAX << cc("), got \"") << agrs[i] << cc("\"\n");
+
                 return false;
             }
-            width = static_cast<std::int64_t>(value);
+            width = static_cast<ptrdiff_t>(value);
         }
         else if (cstrcmp(arg, cc("-po")) == 0)
         {
@@ -475,16 +477,23 @@ bool data(std::ofstream& stream, std::span<const file_input> data)
     for(auto obj : data)
     {
         auto path = std::filesystem::path(obj.path_file);
+        if (!std::filesystem::exists(path)) {
+            ccerr << cc("Error: file does not exist ") << obj.path_file << cc('\n');
+            return false;
+        }
+        size_t size_file = std::filesystem::file_size(path);
         std::ifstream file(path, std::ios::binary);
         if (!file) {
             ccerr << cc("Error: failed to open for reading ") << obj.path_file<<cc('\n');
             return false;
         }
-        file.seekg(0, std::ios::end);
-        size_t size_file = file.tellg();
-        size_t remainder=size_file%parametrs::width;
-        size_t bytes_width = (remainder==0)?0:(parametrs::width - remainder);
-        file.seekg(0, std::ios::beg);
+        size_t bytes_width=0;
+
+        if (parametrs::width > 0)
+        {
+            size_t remainder=size_file%parametrs::width;
+            (remainder==0)?0:(parametrs::width - remainder);
+        }
         if(parametrs::standard==standard_language::ansi)
             stream<<"static const unsigned char ";
         else if(parametrs::standard == standard_language::cpp98 ||
@@ -502,7 +511,6 @@ bool data(std::ofstream& stream, std::span<const file_input> data)
                  parametrs::standard==standard_language::cpp20||
                  parametrs::standard==standard_language::cpp23)
             stream<<"constexpr std::array<uint8_t,"<<size_file+1+bytes_width<<"> ";
-
         stream<<obj.name_array;
 
         if(parametrs::standard==standard_language::cpp17||
@@ -539,10 +547,10 @@ bool data(std::ofstream& stream, std::span<const file_input> data)
             parametrs::standard==standard_language::cpp20||
             parametrs::standard==standard_language::cpp23)
             stream<<"}";
-        stream<<";\n";
+        stream<<";\n"<< std::dec;
         if(parametrs::enable_size||parametrs::enable_size_0)
         {
-            stream<<"size_t "<<obj.name_array<<"_size = "<< std::dec;
+            stream<<"size_t "<<obj.name_array<<"_size = ";
             if(parametrs::enable_size_0)stream<< size_file+1;
             else stream<<size_file;
             stream<<";\n";
