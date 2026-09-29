@@ -422,12 +422,16 @@ void include_guard_start(std::ofstream& stream)
 }
 void info(std::ofstream& stream)
 {
+    if(parametrs::standard == standard_language::ansi)
+        stream<<"/*\n";
     stream<<"/// -s "<<detail::bool_str_onf(parametrs::enable_size)
     <<"\n/// -s_0 "<<detail::bool_str_onf(parametrs::enable_size_0)
     <<"\n/// -w "<<((parametrs::width>0)?std::to_string(parametrs::width):detail::off)
     <<"\n/// -po "<<detail::bool_str_onf(parametrs::enable_pragma_once)
     <<"\n/// -cpp_ns "<<detail::bool_str_onf(parametrs::cpp_namespace!=nullptr)
     <<"\n/// Standard "<<detail::to_string(parametrs::standard)<<"\n";
+    if(parametrs::standard == standard_language::ansi)
+        stream<<"*/\n";
 }
 void includes(std::ofstream& stream)
 {
@@ -554,7 +558,9 @@ void include_guard_end(std::ofstream& stream)
 {
     if(!parametrs::enable_pragma_once)
     {
-        stream<<"#endif // BIN2CPP_"<<detail::get_guard()<<"_HGUARD";
+        stream<<"#endif";
+        if(parametrs::standard != standard_language::ansi)
+        stream<<"// BIN2CPP_"<<detail::get_guard()<<"_HGUARD";
     }
 }
 
